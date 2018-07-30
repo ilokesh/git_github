@@ -1,1 +1,66 @@
 bjvf
+import openpyxl
+from github import Github
+from itertools import izip
+import xlsxwriter
+# import win32com.client as win32
+
+
+class Featurebranches:
+    var_branchdetails = []
+    global dct
+    dct = {}
+
+    @staticmethod
+    def getbranchname():
+        # var_username = raw_input("enter the username")
+        # var_password = raw_input("enter the password")
+        git_object = Github("ilokesh", "user@1234")
+        var_branchdetails = [ ]
+        var_repo_names = [ ]
+        dct = {}
+        for repo in git_object.get_user().get_repos():
+            print(repo.name)
+            for branch in repo.get_branches():
+                branchess = repo.get_branch(branch.name)
+                text = branchess.name
+
+                if not text.startswith("master"):
+                    var_repo_names.append(repo.name)
+                    var_branchdetails.append(branchess.name)
+                obj1 = tuple(var_repo_names)
+
+        for i, j in izip(obj1, var_branchdetails):
+            dct.setdefault(i, []).append(j)
+        print(dct)
+
+        """excel = win32.gencache.EnsureDispatch('Excel.Application')
+        wb = excel.Workbooks.Open(r'file.xlsx')
+        ws = wb.Worksheets("Sheet1")
+        ws.Columns.AutoFit()
+        wb.Save()
+        excel.Application.Quit()"""
+
+        workbook = xlsxwriter.Workbook("C:\\New folder (2)\\example1.xlsx")
+        worksheet = workbook.add_worksheet()
+        bold = workbook.add_format({'bold': 1})
+        worksheet.set_column(0, 1, 35)
+
+        worksheet.write('A1', 'Repositories', bold)
+        worksheet.write('B1', 'List of feature branchnames', bold)
+
+        row = 0
+        col = 0
+
+        for key in dct.keys():
+            row += 1
+            worksheet.write(row, col, key)
+            for item in dct[key]:
+                worksheet.write(row, col + 1, item)
+                row += 1
+
+        workbook.close()
+
+
+
+    print 'copying done'
